@@ -45,8 +45,14 @@ public class EventServiceImpl {
 
         Map<Long, Long> viewsStat = statService.getViews(eventList, false);
 
-        return eventList.stream().map(e -> EventMapper.toEventShortDto(e, requestRepository.getConfirmedRequests(e.getId()),
-                viewsStat.getOrDefault(e.getId(), 0L))).collect(Collectors.toList());
+        if (params.getSort().equals(EventSort.EVENT_DATE)) {
+            return eventList.stream().map(e -> EventMapper.toEventShortDto(e, requestRepository.getConfirmedRequests(e.getId()),
+                    viewsStat.getOrDefault(e.getId(), 0L))).collect(Collectors.toList());
+        } else {
+            return eventList.stream().map(e -> EventMapper.toEventShortDto(e, requestRepository.getConfirmedRequests(e.getId()),
+                    viewsStat.getOrDefault(e.getId(), 0L))).sorted(Comparator.comparingLong(EventShortDto::getViews))
+                    .collect(Collectors.toList());
+        }
     }
 
     public EventFullDto getEventById(long id, HttpServletRequest request) {
@@ -241,7 +247,7 @@ public class EventServiceImpl {
 
     public List<EventFullDto> getAdminEvents(AdminEventParams params) {
         List<Event> eventList = eventRepository.getAdminEvents(params.getUsers(), params.getCategories(),
-                params.getRangeStart(), params.getRangeEnd(), params.getStates(),params.getPageRequest());
+                params.getRangeStart(), params.getRangeEnd(), params.getStates(), params.getPageRequest());
 
         Map<Long, Long> viewsStat = statService.getViews(eventList, false);
 

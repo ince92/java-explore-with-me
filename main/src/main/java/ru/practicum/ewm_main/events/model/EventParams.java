@@ -22,6 +22,7 @@ public class EventParams {
     private LocalDateTime rangeEnd;
     private Boolean onlyAvailable;
     private PageRequest pageRequest;
+    private EventSort sort;
 
     public EventParams(String text, Long[] categories, Boolean paid, String rangeStart,
                        String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size) {
@@ -37,14 +38,13 @@ public class EventParams {
         }
         this.onlyAvailable = onlyAvailable;
         try {
-            EventSort thisSort = EventSort.valueOf(sort);
+            this.sort = EventSort.valueOf(sort);
 
-            if (thisSort == EventSort.EVENT_DATE) {
-                int page = from / size;
+            int page = from / size;
+            if (this.sort.equals(EventSort.EVENT_DATE)) {
                 this.pageRequest = PageRequest.of(page, size, Sort.by("date"));
             } else {
-                int page = from / size;
-                this.pageRequest = PageRequest.of(page, size, Sort.by("views"));
+                this.pageRequest = PageRequest.of(page, size);
             }
 
 
