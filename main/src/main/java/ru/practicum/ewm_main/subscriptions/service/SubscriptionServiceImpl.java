@@ -20,6 +20,7 @@ import ru.practicum.ewm_main.users.model.dto.UserMapper;
 import ru.practicum.ewm_main.users.model.dto.UserShortDto;
 import ru.practicum.ewm_main.users.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -98,7 +99,7 @@ public class SubscriptionServiceImpl {
     public List<EventShortDto> getActualEvents(Long id) {
         User user = userRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Пользователь с таким id не найден!"));
-        List<Event> eventList = eventRepository.getEventsBySubscriber(id, SubscriptionStatus.CONFIRMED);
+        List<Event> eventList = eventRepository.getEventsBySubscriber(id, SubscriptionStatus.CONFIRMED, LocalDateTime.now());
         Map<Long, Long> viewsStat = statService.getViews(eventList, false);
         return eventList.stream().map(e -> EventMapper.toEventShortDto(e, requestRepository.getConfirmedRequests(e.getId()),
                 viewsStat.getOrDefault(e.getId(), 0L))).collect(Collectors.toList());

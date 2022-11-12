@@ -38,8 +38,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> getEventsByCategoryId(Long id);
 
     @Query(value = "select e from Event e join Subscription s on e.initiator.id = s.author.id " +
-            "where s.subscriber.id = :id and s.status = :status")
-    List<Event> getEventsBySubscriber(@Param("id") Long id, @Param("status") SubscriptionStatus status);
+            "where s.subscriber.id = :id and s.status = :status and e.date > :date")
+    List<Event> getEventsBySubscriber(@Param("id") Long id, @Param("status") SubscriptionStatus status,
+                                      @Param("date") LocalDateTime date);
 
 
 }
