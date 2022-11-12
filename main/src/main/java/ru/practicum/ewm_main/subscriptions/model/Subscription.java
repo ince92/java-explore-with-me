@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class Subscription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "subscription_id")
     private Long id;
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "subscriber_id")
