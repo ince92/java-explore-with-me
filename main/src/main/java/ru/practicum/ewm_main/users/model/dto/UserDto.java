@@ -21,4 +21,6 @@ public class UserDto {
     @Email
     @NotBlank
     private String email;
+
+    private Boolean subscriptionWithConfirm;
 }

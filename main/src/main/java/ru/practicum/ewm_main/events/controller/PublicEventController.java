@@ -22,13 +22,13 @@ public class PublicEventController {
     private final EventServiceImpl eventService;
 
     @GetMapping()
-    public List<EventShortDto> getEvents(@RequestParam(name = "text") String text,
-                                         @RequestParam(name = "categories") Long[] categories,
-                                         @RequestParam(name = "paid") Boolean paid,
-                                         @RequestParam(name = "rangeStart") String rangeStart,
-                                         @RequestParam(name = "rangeEnd") String rangeEnd,
-                                         @RequestParam(name = "onlyAvailable") Boolean onlyAvailable,
-                                         @RequestParam(name = "sort") String sort,
+    public List<EventShortDto> getEvents(@RequestParam(name = "text", required = false) String text,
+                                         @RequestParam(name = "categories", required = false) Long[] categories,
+                                         @RequestParam(name = "paid", required = false) Boolean paid,
+                                         @RequestParam(name = "rangeStart", required = false) String rangeStart,
+                                         @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
+                                         @RequestParam(name = "onlyAvailable", required = false) Boolean onlyAvailable,
+                                         @RequestParam(name = "sort", required = false) String sort,
                                          @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                          @Positive @RequestParam(name = "size", defaultValue = "10") Integer size,
                                          HttpServletRequest request) {

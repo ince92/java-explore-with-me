@@ -3,12 +3,14 @@ package ru.practicum.ewm_client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +26,7 @@ public class EventClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getViews(List<String> uriList, Boolean unique, String start, String end) {
+    public ResponseEntity<List<StatsDto>> getViews(List<String> uriList, Boolean unique, String start, String end) {
         StringBuilder str = new StringBuilder();
         for (String uri : uriList) {
             str.append("uris=").append(uri).append("&");
@@ -34,11 +36,14 @@ public class EventClient extends BaseClient {
                 "start", start,
                 "end", end
         );
-        return get("/stats?" + str + "unique={unique}&start={start}&end={end}", parameters);
+        return get("/stats?" + str + "unique={unique}&start={start}&end={end}", parameters, new ParameterizedTypeReference<List<StatsDto>>() {
+        });
     }
 
     public void hit(String uri, String ip) {
-        post("/hit", new EndpointHitDto("main-service", uri, ip, LocalDateTime.now().toString()));
+        post("/hit", new EndpointHitDto("ewm-main-service", uri, ip,
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))), new ParameterizedTypeReference<Object>() {
+        });
     }
 
 

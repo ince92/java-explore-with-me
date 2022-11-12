@@ -8,6 +8,7 @@ import ru.practicum.ewm_main.users.model.dto.NewUserRequest;
 import ru.practicum.ewm_main.users.model.dto.UserDto;
 import ru.practicum.ewm_main.users.service.UserServiceImpl;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -22,7 +23,7 @@ public class AdminUserController {
     @GetMapping()
     public List<UserDto> getUsers(@PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                   @Positive @RequestParam(name = "size", defaultValue = "10") Integer size,
-                                  @RequestParam(name = "ids") List<Long> ids) {
+                                  @RequestParam(name = "ids",required = false) List<Long> ids) {
         int page = from / size;
         final PageRequest pageRequest = PageRequest.of(page, size);
         log.info("Получаем пользователей");
@@ -31,7 +32,7 @@ public class AdminUserController {
     }
 
     @PostMapping()
-    public UserDto createUser(@RequestBody NewUserRequest newUser) {
+    public UserDto createUser(@RequestBody @Valid NewUserRequest newUser) {
         log.info("Добавляем пользователя- {}", newUser.getName());
         return userService.createUser(newUser);
 

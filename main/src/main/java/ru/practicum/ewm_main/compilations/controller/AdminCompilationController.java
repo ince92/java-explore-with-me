@@ -7,6 +7,8 @@ import ru.practicum.ewm_main.compilations.model.dto.CompilationDto;
 import ru.practicum.ewm_main.compilations.model.dto.NewCompilationDto;
 import ru.practicum.ewm_main.compilations.service.CompilationServiceImpl;
 
+import javax.validation.Valid;
+
 @RestController
 @Slf4j
 @RequestMapping(path = "/admin/compilations")
@@ -15,7 +17,7 @@ public class AdminCompilationController {
     private final CompilationServiceImpl compilationService;
 
     @PostMapping()
-    public CompilationDto createCompilation(@RequestBody NewCompilationDto newCompilation) {
+    public CompilationDto createCompilation(@RequestBody @Valid NewCompilationDto newCompilation) {
         log.info("Добавление подборки - {}", newCompilation.getTitle());
         return compilationService.createCompilation(newCompilation);
     }

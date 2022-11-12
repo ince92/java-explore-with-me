@@ -41,16 +41,19 @@ public class EventServiceImpl {
         List<Event> eventList = eventRepository.getEvents(params.getText(), params.getCategories(), params.getPaid(),
                 params.getRangeStart(), params.getRangeEnd(), params.getPageRequest());
 
+        Map<Long, Long> confirmedMap = getConfirmedRequestsList(eventList);
+
+
         statService.hit(request.getRequestURI(), request.getRemoteAddr());
 
         Map<Long, Long> viewsStat = statService.getViews(eventList, false);
 
         if (params.getSort().equals(EventSort.EVENT_DATE)) {
-            return eventList.stream().map(e -> EventMapper.toEventShortDto(e, requestRepository.getConfirmedRequests(e.getId()),
+            return eventList.stream().map(e -> EventMapper.toEventShortDto(e, confirmedMap.getOrDefault(e.getId(), 0L),
                     viewsStat.getOrDefault(e.getId(), 0L))).collect(Collectors.toList());
         } else {
-            return eventList.stream().map(e -> EventMapper.toEventShortDto(e, requestRepository.getConfirmedRequests(e.getId()),
-                    viewsStat.getOrDefault(e.getId(), 0L))).sorted(Comparator.comparingLong(EventShortDto::getViews))
+            return eventList.stream().map(e -> EventMapper.toEventShortDto(e, confirmedMap.getOrDefault(e.getId(), 0L),
+                            viewsStat.getOrDefault(e.getId(), 0L))).sorted(Comparator.comparingLong(EventShortDto::getViews))
                     .collect(Collectors.toList());
         }
     }
@@ -73,10 +76,10 @@ public class EventServiceImpl {
         User user = userRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Пользователь с таким id не найден!"));
         List<Event> eventList = eventRepository.getEventsByInitiatorId(user.getId(), page);
-
+        Map<Long, Long> confirmedMap = getConfirmedRequestsList(eventList);
         Map<Long, Long> viewsStat = statService.getViews(eventList, false);
 
-        return eventList.stream().map(e -> EventMapper.toEventShortDto(e, requestRepository.getConfirmedRequests(e.getId()),
+        return eventList.stream().map(e -> EventMapper.toEventShortDto(e, confirmedMap.getOrDefault(e.getId(), 0L),
                 viewsStat.getOrDefault(e.getId(), 0L))).collect(Collectors.toList());
 
 
@@ -248,10 +251,11 @@ public class EventServiceImpl {
     public List<EventFullDto> getAdminEvents(AdminEventParams params) {
         List<Event> eventList = eventRepository.getAdminEvents(params.getUsers(), params.getCategories(),
                 params.getRangeStart(), params.getRangeEnd(), params.getStates(), params.getPageRequest());
+        Map<Long, Long> confirmedMap = getConfirmedRequestsList(eventList);
 
         Map<Long, Long> viewsStat = statService.getViews(eventList, false);
 
-        return eventList.stream().map(e -> EventMapper.toEventFullDto(e, requestRepository.getConfirmedRequests(e.getId()),
+        return eventList.stream().map(e -> EventMapper.toEventFullDto(e, confirmedMap.getOrDefault(e.getId(), 0L),
                 viewsStat.getOrDefault(e.getId(), 0L))).collect(Collectors.toList());
     }
 
@@ -333,6 +337,22 @@ public class EventServiceImpl {
         eventRepository.save(event);
         Long viewsStat = statService.getView(event, false);
         return EventMapper.toEventFullDto(event, requestRepository.getConfirmedRequests(event.getId()), viewsStat);
+    }
+
+    private Map<Long, Long> getConfirmedRequestsList(List<Event> eventList) {
+        List<Long> ids = new ArrayList<>();
+
+        for (Event event : eventList) {
+            ids.add(event.getId());
+        }
+
+        List<Request> requestList = requestRepository.getConfirmedRequestsList(ids);
+        Map<Long, Long> requestMap = new HashMap<>();
+        for (Request request : requestList) {
+            requestMap.put(request.getEvent().getId(), requestMap.getOrDefault(request.getEvent().getId(), 0L) + 1L);
+        }
+
+        return requestMap;
     }
 
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm_client.EventClient;
+import ru.practicum.ewm_client.StatsDto;
 import ru.practicum.ewm_main.events.model.Event;
 
 
@@ -24,17 +25,17 @@ public class StatService {
         List<String> uriList = new ArrayList<>();
         Map<String, Long> urisMap = new HashMap<>();
         for (Event event : eventList) {
-            uriList.add("/event/" + event.getId());
-            urisMap.put("/event/" + event.getId(), event.getId());
+            uriList.add("/events/" + event.getId());
+            urisMap.put("/events/" + event.getId(), event.getId());
         }
         LocalDateTime endTime = LocalDateTime.now();
         LocalDateTime startTime = eventList.stream().min(Comparator.comparing(Event::getCreatedOn)).get().getCreatedOn();
 
 
-        ResponseEntity<Object> viewsList = eventClient.getViews(uriList, unique,
+        ResponseEntity<List<StatsDto>> viewsList = eventClient.getViews(uriList, unique,
                 startTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), endTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
-        List<StatsDto> statsList = (List<StatsDto>) viewsList.getBody();
+        List<StatsDto> statsList = viewsList.getBody();
 
         Map<Long, Long> viewsMap = new HashMap<>();
         if (statsList != null) {
@@ -51,11 +52,11 @@ public class StatService {
         LocalDateTime endTime = LocalDateTime.now();
         LocalDateTime startTime = event.getCreatedOn();
 
-        ResponseEntity<Object> viewsList = eventClient.getViews(List.of("/event/" + event.getId()), unique,
+        ResponseEntity<List<StatsDto>> viewsList = eventClient.getViews(List.of("/events/" + event.getId()), unique,
                 startTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                 endTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
-        List<StatsDto> statsList = (List<StatsDto>) viewsList.getBody();
+        List<StatsDto> statsList = viewsList.getBody();
 
         if (statsList != null && statsList.size() > 0) {
             return statsList.get(0).getHits();

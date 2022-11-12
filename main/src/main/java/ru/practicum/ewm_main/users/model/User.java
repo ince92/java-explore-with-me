@@ -20,5 +20,7 @@ public class User {
     private String name;
     @Column(name = "user_email")
     private String email;
+    @Column(name = "user_subscription_with_confirm")
+    private Boolean subscriptionWithConfirm;
 }
 
