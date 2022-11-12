@@ -31,10 +31,12 @@ public class AdminEventParams {
             this.rangeEnd = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         } else {
             this.rangeStart = LocalDateTime.now();
-            this.rangeEnd = LocalDateTime.MAX;
+            this.rangeEnd = LocalDateTime.now().plusYears(100);
         }
-        this.states = states.stream().map(EventState::valueOf).collect(Collectors.toList());
-        int page = from / size;
+        if (states != null) {
+            this.states = states.stream().map(EventState::valueOf).collect(Collectors.toList());
+        }
+            int page = from / size;
 
         this.pageRequest = PageRequest.of(page, size);
     }

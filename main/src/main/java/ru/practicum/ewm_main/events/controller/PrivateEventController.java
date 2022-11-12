@@ -11,6 +11,7 @@ import ru.practicum.ewm_main.events.model.dto.UpdateEventRequest;
 import ru.practicum.ewm_main.events.service.EventServiceImpl;
 import ru.practicum.ewm_main.requests.model.dto.ParticipationRequestDto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -42,7 +43,7 @@ public class PrivateEventController {
 
     @PostMapping()
     public EventFullDto createEvent(@PathVariable("id") Long id,
-                                    @RequestBody NewEventDto newEvent) {
+                                    @RequestBody @Valid NewEventDto newEvent) {
         log.info("Добавляем событие - {}", newEvent.getTitle());
         return eventService.createEvent(id, newEvent);
     }

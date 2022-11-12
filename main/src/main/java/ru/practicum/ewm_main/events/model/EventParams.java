@@ -34,12 +34,16 @@ public class EventParams {
             this.rangeEnd = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         } else {
             this.rangeStart = LocalDateTime.now();
-            this.rangeEnd = LocalDateTime.MAX;
+            this.rangeEnd = LocalDateTime.now().plusYears(100);
         }
         this.onlyAvailable = onlyAvailable;
         try {
-            this.sort = EventSort.valueOf(sort);
 
+            if (sort == null) {
+                this.sort = EventSort.EVENT_DATE;
+            } else {
+                this.sort = EventSort.valueOf(sort);
+            }
             int page = from / size;
             if (this.sort.equals(EventSort.EVENT_DATE)) {
                 this.pageRequest = PageRequest.of(page, size, Sort.by("date"));

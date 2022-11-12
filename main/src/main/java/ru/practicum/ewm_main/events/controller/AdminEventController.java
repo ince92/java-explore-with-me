@@ -8,6 +8,7 @@ import ru.practicum.ewm_main.events.model.dto.AdminUpdateEventRequest;
 import ru.practicum.ewm_main.events.model.dto.EventFullDto;
 import ru.practicum.ewm_main.events.service.EventServiceImpl;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -21,11 +22,11 @@ public class AdminEventController {
     private final EventServiceImpl eventService;
 
     @GetMapping()
-    public List<EventFullDto> getEvents(@RequestParam(name = "users") List<Long> users,
-                                        @RequestParam(name = "categories") List<Long> categories,
-                                        @RequestParam(name = "states") List<String> states,
-                                        @RequestParam(name = "rangeStart") String rangeStart,
-                                        @RequestParam(name = "rangeEnd") String rangeEnd,
+    public List<EventFullDto> getEvents(@RequestParam(name = "users", required = false) List<Long> users,
+                                        @RequestParam(name = "categories", required = false) List<Long> categories,
+                                        @RequestParam(name = "states", required = false) List<String> states,
+                                        @RequestParam(name = "rangeStart", required = false) String rangeStart,
+                                        @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
                                         @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                         @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
 
@@ -36,7 +37,7 @@ public class AdminEventController {
 
     @PutMapping(value = "/{eventId}")
     public EventFullDto updateEvent(@PathVariable("eventId") Long eventId,
-                                    @RequestBody AdminUpdateEventRequest updateRequest) {
+                                    @RequestBody @Valid AdminUpdateEventRequest updateRequest) {
         log.info("Получение события по идентификатору - {}", eventId);
         return eventService.updateAdminEvent(eventId, updateRequest);
     }

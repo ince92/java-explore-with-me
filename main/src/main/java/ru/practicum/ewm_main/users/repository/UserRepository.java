@@ -7,9 +7,16 @@ import ru.practicum.ewm_main.users.model.User;
 
 import java.util.List;
 
-public interface UserRepository extends JpaRepository<User,Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "select u from User u " +
             "where ((coalesce(:ids, null) is null or u.id in :ids))")
-        List<User> getUsers(List<Long> ids, Pageable pagerequest);
+    List<User> getUsers(List<Long> ids, Pageable pageRequest);
+
+    @Query(value = "select u from User u inner join Subscription s on u.id=s.subscriber.id where s.author.id = :id")
+    List<User> getSubscribers(Long id);
+
+    @Query(value = "select u from User u inner join Subscription s on u.id=s.subscriber.id where s.subscriber.id = :id")
+    List<User> getSubscriptions(Long id);
+
 }
