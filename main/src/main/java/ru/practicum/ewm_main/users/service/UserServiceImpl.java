@@ -25,7 +25,8 @@ public class UserServiceImpl {
     }
 
     public UserDto createUser(NewUserRequest newUser) {
-        return UserMapper.toUserDto(userRepository.save(new User(0L, newUser.getName(), newUser.getEmail())));
+        Boolean flag = newUser.getSubscriptionWithConfirm() == null ? false : newUser.getSubscriptionWithConfirm();
+        return UserMapper.toUserDto(userRepository.save(new User(0L, newUser.getName(), newUser.getEmail(), flag)));
     }
 
     public void deleteUser(Long id) {

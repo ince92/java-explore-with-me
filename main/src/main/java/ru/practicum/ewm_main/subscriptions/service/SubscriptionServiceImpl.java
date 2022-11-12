@@ -47,9 +47,15 @@ public class SubscriptionServiceImpl {
         if (subscriptionRepository.getSubscriptionByAuthorIdAndSubscriberId(author.getId(), user.getId()).isPresent()) {
             throw new ValidationException("Запрос на подписку уже существует!");
         }
+        SubscriptionStatus status;
+        if (author.getSubscriptionWithConfirm()) {
+            status = SubscriptionStatus.PENDING;
+        } else {
+            status = SubscriptionStatus.CONFIRMED;
+        }
 
         return SubscriptionMapper.toSubscriptionDto(subscriptionRepository.save(
-                new Subscription(0L, user, author, SubscriptionStatus.PENDING)));
+                new Subscription(0L, user, author, status)));
     }
 
     public SubscriptionDto setSubscriptionCancelled(Long id, Long subscriptionId) {
@@ -112,13 +118,13 @@ public class SubscriptionServiceImpl {
     public List<UserShortDto> getSubscribers(Long id) {
         User user = userRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Пользователь с таким id не найден!"));
-        return userRepository.getSubscribers(id).stream().map(UserMapper::toUserShortDto).collect(Collectors.toList());
+        return userRepository.getSubscribers(id, SubscriptionStatus.CONFIRMED).stream().map(UserMapper::toUserShortDto).collect(Collectors.toList());
     }
 
     public List<UserShortDto> getSubscriptions(Long id) {
         User user = userRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("Пользователь с таким id не найден!"));
-        return userRepository.getSubscriptions(id).stream().map(UserMapper::toUserShortDto).collect(Collectors.toList());
+        return userRepository.getSubscriptions(id, SubscriptionStatus.CONFIRMED).stream().map(UserMapper::toUserShortDto).collect(Collectors.toList());
 
     }
 
